@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Game Project Shell</title>
+    <script type="text/javascript" src="./gameengine.js"></script>
+    <script type="text/javascript" src="./assetmanager.js"></script>
+    <script type="text/javascript" src="./main.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+    <div  class = "gameOver" id="gameover">
+        Game Over
+    </div>
+<div class="row">
+    <div class="column">
+        <canvas id="gameWorld" tabindex="1" width="800" height="800"
+                style="border: 1px solid brown; background: lightskyblue"></canvas>
+        <script>
+            window.onload = function () {
+                document.getElementById('gameWorld').focus();
+            };
+            
+        </script>
+    </div>
+    <div class="column">
+        <div class="row">
+            <h1>Controls</h1>
+        </div>
+        <div class="row">
+            <p>Movement keys:     W A S D   or    arrow keys<br>
+                Attack 1:   left clicking will attack in the direction you are currently facing.<br>
+                Attack 2:  Pressing the 1 key will attack in a circle around the character.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
