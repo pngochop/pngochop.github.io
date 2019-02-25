@@ -6,33 +6,47 @@
     <script type="text/javascript" src="./gameengine.js"></script>
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./main.js"></script>
+    <script type="text/javascript" src="./sound.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-    <div  class = "gameOver" id="gameover">
-        Game Over
-    </div>
-<div class="row">
-    <div class="column">
-        <canvas id="gameWorld" tabindex="1" width="800" height="800"
-                style="border: 1px solid brown; background: lightskyblue"></canvas>
-        <script>
-            window.onload = function () {
-                document.getElementById('gameWorld').focus();
-            };
-            
-        </script>
-    </div>
-    <div class="column">
-        <div class="row">
-            <h1>Controls</h1>
+    <p id="gameover" class="gameOver">Game Over</p>
+    <div class="row">
+        <div class="column">
+            <div class="row">
+                <canvas id="viewport" tabindex="1" width="800" height="800"></canvas>
+                <script>
+                    window.onload = function () {
+                        document.getElementById('viewport').focus();
+                    };
+                </script>
+            </div>
+            <div class="row">
+                <button id="start-game" onclick="startGame()">Press to Play</button>
+            </div>
         </div>
-        <div class="row">
-            <p>Movement keys:     W A S D   or    arrow keys<br>
-                Attack 1:   left clicking will attack in the direction you are currently facing.<br>
-                Attack 2:  Pressing the 1 key will attack in a circle around the character.</p>
+        <div class="column">
+            <div class="row">
+                <h1>Controls</h1>
+            </div>
+            <div class="row">
+                <p>
+                    Movement keys: W A S D or arrow keys<br>
+                    Attack 1: left clicking will attack in the direction you are currently facing.<br>
+                    Attack 2: Pressing the 1 key will attack in a circle around the character.<br>
+                    Mute Sound: Pressing the back quote (tilde ~) key will mute and unmute audio.
+                </p>
+            </div>
+            <div class="row">
+                <h1>Information</h1>
+            </div>
+            <div>
+                <p>
+                    Compatible with Chrome, Firefox, and Edge.<br>
+                    Internet Explorer is incompatible due to lack of ES6 support.
+                </p>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>

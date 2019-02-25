@@ -2,13 +2,13 @@
 
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            window.oRequestAnimationFrame ||
-            window.msRequestAnimationFrame ||
-            function (/* function */ callback, /* DOMElement */ element) {
-                window.setTimeout(callback, 1000 / 60);
-            };
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (/* function */ callback, /* DOMElement */ element) {
+            window.setTimeout(callback, 1000 / 60);
+        };
 })();
 
 
@@ -30,21 +30,27 @@ Timer.prototype.tick = function () {
 
 function GameEngine(ctx, width, height) {
     this.entities = [];
+    this.sounds = new Map(); // The key name can be different than the audio file name.
     this.showOutlines = false;
     this.ctx = ctx;
     this.click = null;
     this.mouse = null;
     this.wheel = null;
-	this.one = null;
+    this.one = null;
     this.surfaceWidth = width;
     this.surfaceHeight = height;
-    this.origin = {x: 0, y: 0};
+    this.viewport = { x: 0, y: 0, sx: 1, sy: 1 };
     this.debug = false; // If true, console output and entity boxes will appear.
-    this.screenSize = {width: width, height: height};
+    this.screenSize = { width: width, height: height };
+    this.settings = {
+        audio: {
+            muted: false
+        }
+    }
 }
 
 GameEngine.prototype.init = function () {
-    
+
     this.startInput();
     this.timer = new Timer();
     console.log('game initialized');
@@ -63,7 +69,7 @@ GameEngine.prototype.startInput = function () {
     console.log('Starting input');
     var that = this;
 
-    var getXandY = function(e) {
+    var getXandY = function (e) {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
 
@@ -74,12 +80,30 @@ GameEngine.prototype.startInput = function () {
         return { x: x, y: y };
     }
 
-    this.ctx.canvas.addEventListener("keydown", function(e) {
-        switch(e.keyCode) {
+    window.addEventListener('keydown', function (e) {
+        switch (e.key) {
+            case '`':
+                let muted = !that.settings.audio.muted;
+                for (let s of that.sounds.values()) {
+                    s._audio.muted = muted;
+                }
+                that.settings.audio.muted = muted;
+                break;
+            case 'H':
+            case 'h':
+                that.used = 'hp';
+            default:
+                break;
+        }
+    })
+
+    this.ctx.canvas.addEventListener("keydown", function (e) {
+        switch (e.keyCode) {
             case 49: // 1
                 that.one = true;
+                that.sounds.get('characterAttack02').replay();
                 break;
-			case 32: // ' '
+            case 32: // ' '
                 that.space = true;
                 break;
             case 37: // arrow left
@@ -109,12 +133,12 @@ GameEngine.prototype.startInput = function () {
         //if (String.fromCharCode(e.which) === ' ') that.space = true;
     }, false);
 
-    this.ctx.canvas.addEventListener("keyup", function(e) {
+    this.ctx.canvas.addEventListener("keyup", function (e) {
         switch (e.keyCode) {
             case 49: // 1
                 that.one = false;
                 break;
-			case 32: // ' '
+            case 32: // ' '
                 that.space = false;
                 break;
             case 37: // arrow left
@@ -139,11 +163,11 @@ GameEngine.prototype.startInput = function () {
         }
     }, false);
 
-    this.ctx.canvas.addEventListener("click", function(e) {
+    this.ctx.canvas.addEventListener("click", function (e) {
         that.click = getXandY(e);
+        that.sounds.get('characterAttack01').replay();
         if (that.debug) console.log("Clicked at " + e.clientX + "," + e.clientY); // The coordinates on the browser screen.
     }, false);
-
     console.log('Input started');
 }
 
@@ -153,17 +177,52 @@ GameEngine.prototype.addEntity = function (entity) {
 }
 
 GameEngine.prototype.draw = function () {
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.save();
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.restore();
+    let ctx = this.ctx;
+    let viewport = this.viewport;
+    let sx = viewport.sx;
+    let sy = viewport.sy;
+    let cw = ctx.canvas.width;
+    let ch = ctx.canvas.height;
+    // Calculate the x and y (top left) of a scaled window.
+    let tx = viewport.x / sx;
+    let ty = viewport.y / sy;
+
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.save();
+    ctx.resetTransform();
+    // Scaling the context ahead of time can simulate zooming.
+    ctx.scale(sx, sy);
+    // We must translate the canvas to it's expected position.
+    ctx.translate(-tx, -ty);
     for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].draw(this.ctx);
+        this.entities[i].draw(ctx);
     }
+
+    if (this.debug) {
+
+        // Calculates the width and height of a scaled window.
+        let sw = cw / sx;
+        let sh = ch / sy;
+
+        // ctx.fillStyle = 'blue';
+        // ctx.fillRect(tx, ty, sw / 2, sh / 2);
+
+        ctx.strokeStyle = 'blue';
+        ctx.beginPath();
+        ctx.moveTo(tx, ty + sh / 2);;
+        ctx.lineTo(tx + sw, ty + sh / 2);;
+        ctx.moveTo(tx + sw / 2, ty);
+        ctx.lineTo(tx + sw / 2, ty + sh);
+        ctx.stroke();
+    }
+
+    this.ctx.restore();
 }
 
 GameEngine.prototype.update = function () {
+    // Makes the viewport zoom in and out.
+    // this.viewport.sx = this.viewport.sy = 1 + (Math.sin(performance.now() / 1000) + 1) / 2;
+
     var entitiesCount = this.entities.length;
 
     for (var i = 0; i < entitiesCount; i++) {
@@ -187,15 +246,15 @@ GameEngine.prototype.loop = function () {
     this.draw();
     this.space = null;
     this.click = null;
-	this.one = null;
+    this.one = null;
 }
 
-function Entity(game, x, y) {
+function Entity(game, x, y, genAABB = true) {
     this.game = game;
     this.x = x;
     this.y = y;
     this.removeFromWorld = false;
-    this.boundingBox = new BoundingBox(this.x, this.y, 99, 99); // 99 is default width and height.
+    if (genAABB) this.boundingBox = new BoundingBox(this.x, this.y, 99, 99); // 99 is default width and height.
 }
 
 // The imaginary box around the entity.
@@ -210,18 +269,18 @@ function BoundingBox(theX, theY, width, height, xOffset, yOffset) {
     this.top = theY;
     this.right = this.left + width;
     this.bottom = this.top + height;
-    this._origin = {x: this.left + this.width/2, y: this.top + this.height/2};
+    this._origin = { x: this.left + this.width / 2, y: this.top + this.height / 2 };
 }
 
 BoundingBox.prototype = {
     set x(value) {
         this._x = value + this._xOffset;
-        this._origin.x = this._x - (this.width/2);
+        this._origin.x = this._x - (this.width / 2);
     },
     get x() { return this._x },
     set y(value) {
         this._y = value + this._yOffset;
-        this._origin.y = this._y - (this.height/2);
+        this._origin.y = this._y - (this.height / 2);
     },
     get y() { return this._y },
     get origin() { return this._origin },
@@ -235,10 +294,10 @@ BoundingBox.prototype = {
 
 // Not yet used.
 BoundingBox.prototype.collide = function (oth) {
-    if (    this.right > oth.left 
-        &&   this.left < oth.right 
-        &&    this.top < oth.bottom 
-        && this.bottom > oth.top) 
+    if (this.right > oth.left
+        && this.left < oth.right
+        && this.top < oth.bottom
+        && this.bottom > oth.top)
         return true;
     return false;
 }
