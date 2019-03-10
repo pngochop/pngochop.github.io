@@ -583,11 +583,18 @@ var
             $("faster_button").onclick = function()
             {
                 var step = life.step + 1;
-
                 life.set_step(step);
                 set_text($("label_step"), Math.pow(2, step));
             };
-
+            
+            $("myRange").oninput = function () {
+                var step = $("myRange").value;
+                //alert(step);
+                life.set_step(step - '0');
+                //set_text($("label_step"), "4");
+                set_text($("demo"), step);
+                
+            }
             $("slower_button").onclick = function()
             {
                 if(life.step > 0)
