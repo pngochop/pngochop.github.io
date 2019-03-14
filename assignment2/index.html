@@ -1,16 +1,17 @@
 ﻿<!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Assignment2</title>
-<meta name="description" content="A JavaScript version of Conway's Game of Life, based on the Hashlife-algorithm.">
-<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<link rel="stylesheet" href="life.css" type="text/css">
-<script src="life.js"></script>
-<script src="formats.js"></script>
-<script src="draw.js"></script>
-<script src="macrocell.js"></script>
-<script src="main.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Assignment2</title>
+    <meta name="description" content="A JavaScript version of Conway's Game of Life, based on the Hashlife-algorithm.">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" href="life.css" type="text/css">
+    <script src="life.js"></script>
+    <script src="formats.js"></script>
+    <script src="draw.js"></script>
+    <script src="macrocell.js"></script>
+    <script src="main.js"></script>
+    <script src="http://24.16.255.56:8888/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div id="toolbar" style="display: none;">
@@ -19,8 +20,8 @@
             <div class="button1" id="pattern_button">Patterns</div>
             <!--<div id="more_button">More ...</div>-->
         </div>
-        <div id="export_button" class="button1">Export</div>
-        <div id="import_button" class="button1">Import</div>
+        <div id="export_button" class="button">Save</div>
+        <div id="import_button" class="button">Load</div>
         <div class="button1" id="settings_button">Settings</div>
         <div class="button1" id="clear_button">Clear</div>
         <div class="button1" style="display: none" id="superstep_button">Superstep</div>
@@ -30,6 +31,7 @@
             <pre style="color:white">Speed: <span id="demo"></span>
             </pre>
             <input type="range" min="1" max="5" value="1" class="slider" id="myRange">
+            <div id="text"></div>
         </div>
         <div class="button" id="run_button">Run</div>
 
@@ -158,13 +160,22 @@
             <br>
             <span class="button2" id="alert_close">Ok</span>
         </div>
+        <div id="gameSave" style="display: none;">
+            <div id="gameSave_text">
+                <h2 id="gameSave_title"></h2>
+                <div id="gameSave_description"></div>
+            </div>
+            <br>
+            <br>
+            <span class="button2" id="gameSave_close">Ok</span>
+        </div>
         <div id="pattern_chooser" style="display: none;">
             Source: <a href="http://www.conwaylife.com/wiki/Main_Page" target="_blank">www.conwaylife.com</a>. Thanks!
             &mdash; <a href="examples/" target="_blank">List of all patterns</a>
             <div id="pattern_list"></div>
             <span class="button2" id="pattern_close">Close</span>
         </div>
-        <div id="settings_dialog" style="display: none;">
+        <div id="settings_dialog" style="display:block;">
             <h2>Settings</h2>
             <div class="left" id="select_rules">
                 Rule<br>
@@ -235,6 +246,8 @@
           //  document.getElementById("faster_button").click();
        // }
         window.onload = function () {
+            
+            /*
             document.addEventListener("contextmenu", function (e) {
                 e.preventDefault();
             }, false);
@@ -269,7 +282,7 @@
                 }
                 e.preventDefault();
                 return false;
-            }
+            }*/
         };
     </script>
 </body>

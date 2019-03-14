@@ -532,7 +532,7 @@ var formats = (function()
             lines.push("#N " + name);
         }
 
-        lines.push.apply(lines, comments.map(c => "#C " + c));
+        //lines.push.apply(lines, comments.map(c => "#Speed = " + c));
 
         const root = life.root;
         const bounds = life.get_root_bounds();
