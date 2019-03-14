@@ -717,7 +717,8 @@ var
                 life.set_step(data.data.speed);
                 $("myRange").value = data.data.speed;
                 set_text($("demo"), data.data.speed);
-                setup_pattern(data.data.dataM,"hop");
+                setup_pattern(data.data.dataM, "hop");
+                show_overlay("gameSave");
             });
 
             var text = document.getElementById("text");
@@ -735,7 +736,7 @@ var
             $("import_button").onclick = function () {                
                 socket.emit("load", { studentname: "Hop Pham", statename: "gameoflife" });
                 set_text($("gameSave_title"), "Your game loaded");
-                show_overlay("gameSave");
+                
             };
             /*
             $("import_button").onclick = function()
