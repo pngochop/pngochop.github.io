@@ -1,7 +1,7 @@
 import GameEngine from './GameEngine.js';
 import Entity from './Entity.js'
 import Sound from './Sound.js';
-import Level1A from './levels/dungeon/1B.js';
+import Level1A from './levels/dungeon/1A.js';
 
 let GAME = new GameEngine(document.getElementById('viewport'));
 
